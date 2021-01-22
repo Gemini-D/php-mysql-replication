@@ -256,7 +256,7 @@ class BasicTest extends BaseTest
 
         $this->createAndInsertValue($create_query, $insert_query);
 
-        $this->connection->executeStatementuteStatement('UPDATE t1 SET j = JSON_SET(j, \'$.addr.detail.ab\', \'970785C8\')');
+        $this->connection->executeStatement('UPDATE t1 SET j = JSON_SET(j, \'$.addr.detail.ab\', \'970785C8\')');
 
         self::assertInstanceOf(XidDTO::class, $this->getEvent());
         self::assertInstanceOf(QueryDTO::class, $this->getEvent());
