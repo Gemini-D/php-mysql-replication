@@ -1,7 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event\RowEvent;
 
 use MySQLReplication\BinaryDataReader\BinaryDataReader;
@@ -11,14 +13,23 @@ use MySQLReplication\Repository\FieldDTO;
 class ColumnDTO
 {
     private $fieldDTO;
+
     private $maxLength;
+
     private $size;
+
     private $fsp;
+
     private $lengthSize;
+
     private $precision;
+
     private $decimals;
+
     private $bits;
+
     private $bytes;
+
     private $type;
 
     public function __construct(
@@ -94,7 +105,7 @@ class ColumnDTO
             $bytes = $binaryDataReader->readUInt8();
 
             $bits = ($bytes * 8) + $bits;
-            $bytes = (int)(($bits + 7) / 8);
+            $bytes = (int) (($bits + 7) / 8);
         }
 
         return new self(
@@ -186,7 +197,7 @@ class ColumnDTO
 
     public function isUnsigned(): bool
     {
-        return !(stripos($this->fieldDTO->getColumnType(), 'unsigned') === false);
+        return ! (stripos($this->fieldDTO->getColumnType(), 'unsigned') === false);
     }
 
     public function isPrimary(): bool

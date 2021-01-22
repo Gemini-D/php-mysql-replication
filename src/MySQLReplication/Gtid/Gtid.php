@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Gtid;
 
 use MySQLReplication\BinaryDataReader\BinaryDataReader;
@@ -8,6 +11,7 @@ use MySQLReplication\BinaryDataReader\BinaryDataReader;
 class Gtid
 {
     private $intervals = [];
+
     private $sid;
 
     /**
@@ -15,7 +19,7 @@ class Gtid
      */
     public function __construct(string $gtid)
     {
-        if (false === (bool)preg_match('/^([0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})((?::[0-9-]+)+)$/', $gtid, $matches)) {
+        if ((bool) preg_match('/^([0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})((?::[0-9-]+)+)$/', $gtid, $matches) === false) {
             throw new GtidException(GtidException::INCORRECT_GTID_MESSAGE, GtidException::INCORRECT_GTID_CODE);
         }
 
@@ -33,10 +37,10 @@ class Gtid
 
         foreach ($this->intervals as $interval) {
             if (count($interval) !== 1) {
-                $buffer .= BinaryDataReader::pack64bit((int)$interval[0]);
-                $buffer .= BinaryDataReader::pack64bit((int)$interval[1]);
+                $buffer .= BinaryDataReader::pack64bit((int) $interval[0]);
+                $buffer .= BinaryDataReader::pack64bit((int) $interval[1]);
             } else {
-                $buffer .= BinaryDataReader::pack64bit((int)$interval[0]);
+                $buffer .= BinaryDataReader::pack64bit((int) $interval[0]);
                 $buffer .= BinaryDataReader::pack64bit($interval[0] + 1);
             }
         }
@@ -46,6 +50,6 @@ class Gtid
 
     public function getEncodedLength(): int
     {
-        return (40 * count($this->intervals));
+        return 40 * count($this->intervals);
     }
 }

@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Config;
 
 use JsonSerializable;
@@ -8,21 +11,37 @@ use JsonSerializable;
 class Config implements JsonSerializable
 {
     private static $user;
+
     private static $host;
+
     private static $port;
+
     private static $password;
+
     private static $charset;
+
     private static $gtid;
+
     private static $slaveId;
+
     private static $binLogFileName;
+
     private static $binLogPosition;
+
     private static $eventsOnly;
+
     private static $eventsIgnore;
+
     private static $tablesOnly;
+
     private static $databasesOnly;
+
     private static $mariaDbGtid;
+
     private static $tableCacheSize;
+
     private static $custom;
+
     private static $heartbeatPeriod;
 
     public function __construct(
@@ -68,46 +87,55 @@ class Config implements JsonSerializable
      */
     public static function validate(): void
     {
-        if (!empty(self::$host)) {
+        if (! empty(self::$host)) {
             $ip = gethostbyname(self::$host);
-            if (false === filter_var($ip, FILTER_VALIDATE_IP)) {
+            if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
                 throw new ConfigException(ConfigException::IP_ERROR_MESSAGE, ConfigException::IP_ERROR_CODE);
             }
         }
-        if (!empty(self::$port) && false === filter_var(
-                self::$port, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]
-            )) {
+        if (! empty(self::$port) && filter_var(
+            self::$port,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 0]]
+        ) === false) {
             throw new ConfigException(ConfigException::PORT_ERROR_MESSAGE, ConfigException::PORT_ERROR_CODE);
         }
-        if (!empty(self::$gtid)) {
+        if (! empty(self::$gtid)) {
             foreach (explode(',', self::$gtid) as $gtid) {
-                if (!(bool)preg_match(
-                    '/^([0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})((?::[0-9-]+)+)$/', $gtid, $matches
+                if (! (bool) preg_match(
+                    '/^([0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12})((?::[0-9-]+)+)$/',
+                    $gtid,
+                    $matches
                 )) {
                     throw new ConfigException(ConfigException::GTID_ERROR_MESSAGE, ConfigException::GTID_ERROR_CODE);
                 }
             }
         }
-        if (!empty(self::$slaveId) && false === filter_var(
-                self::$slaveId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]
-            )) {
+        if (! empty(self::$slaveId) && filter_var(
+            self::$slaveId,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 0]]
+        ) === false) {
             throw new ConfigException(ConfigException::SLAVE_ID_ERROR_MESSAGE, ConfigException::SLAVE_ID_ERROR_CODE);
         }
-        if (false === filter_var(self::$binLogPosition, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])) {
+        if (filter_var(self::$binLogPosition, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]) === false) {
             throw new ConfigException(
-                ConfigException::BIN_LOG_FILE_POSITION_ERROR_MESSAGE, ConfigException::BIN_LOG_FILE_POSITION_ERROR_CODE
+                ConfigException::BIN_LOG_FILE_POSITION_ERROR_MESSAGE,
+                ConfigException::BIN_LOG_FILE_POSITION_ERROR_CODE
             );
         }
-        if (false === filter_var(self::$tableCacheSize, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]])) {
+        if (filter_var(self::$tableCacheSize, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]) === false) {
             throw new ConfigException(
-                ConfigException::TABLE_CACHE_SIZE_ERROR_MESSAGE, ConfigException::TABLE_CACHE_SIZE_ERROR_CODE
+                ConfigException::TABLE_CACHE_SIZE_ERROR_MESSAGE,
+                ConfigException::TABLE_CACHE_SIZE_ERROR_CODE
             );
         }
-        if (0.0 !== self::$heartbeatPeriod && false === (
-                self::$heartbeatPeriod >= 0.001 && self::$heartbeatPeriod <= 4294967.0
-            )) {
+        if (self::$heartbeatPeriod !== 0.0 && false === (
+            self::$heartbeatPeriod >= 0.001 && self::$heartbeatPeriod <= 4294967.0
+        )) {
             throw new ConfigException(
-                ConfigException::HEARTBEAT_PERIOD_ERROR_MESSAGE, ConfigException::HEARTBEAT_PERIOD_ERROR_CODE
+                ConfigException::HEARTBEAT_PERIOD_ERROR_MESSAGE,
+                ConfigException::HEARTBEAT_PERIOD_ERROR_CODE
             );
         }
     }
@@ -174,7 +202,7 @@ class Config implements JsonSerializable
 
     public static function checkDataBasesOnly(string $database): bool
     {
-        return [] !== self::getDatabasesOnly() && !in_array($database, self::getDatabasesOnly(), true);
+        return self::getDatabasesOnly() !== [] && ! in_array($database, self::getDatabasesOnly(), true);
     }
 
     public static function getDatabasesOnly(): array
@@ -184,7 +212,7 @@ class Config implements JsonSerializable
 
     public static function checkTablesOnly(string $table): bool
     {
-        return [] !== self::getTablesOnly() && !in_array($table, self::getTablesOnly(), true);
+        return self::getTablesOnly() !== [] && ! in_array($table, self::getTablesOnly(), true);
     }
 
     public static function getTablesOnly(): array
@@ -194,7 +222,7 @@ class Config implements JsonSerializable
 
     public static function checkEvent(int $type): bool
     {
-        if ([] !== self::getEventsOnly() && !in_array($type, self::getEventsOnly(), true)) {
+        if (self::getEventsOnly() !== [] && ! in_array($type, self::getEventsOnly(), true)) {
             return false;
         }
 

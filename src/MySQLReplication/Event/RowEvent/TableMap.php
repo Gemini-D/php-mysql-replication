@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event\RowEvent;
 
 use JsonSerializable;
@@ -8,9 +11,13 @@ use JsonSerializable;
 class TableMap implements JsonSerializable
 {
     private $database;
+
     private $table;
+
     private $tableId;
+
     private $columnsAmount;
+
     private $columnDTOCollection;
 
     public function __construct(
@@ -48,7 +55,7 @@ class TableMap implements JsonSerializable
     }
 
     /**
-     * @return ColumnDTOCollection|ColumnDTO[]
+     * @return ColumnDTO[]|ColumnDTOCollection
      */
     public function getColumnDTOCollection(): ColumnDTOCollection
     {

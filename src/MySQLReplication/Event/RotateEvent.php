@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event;
 
 use MySQLReplication\BinLog\BinLogServerInfo;
@@ -13,7 +16,7 @@ class RotateEvent extends EventCommon
 {
     public function makeRotateEventDTO(): RotateDTO
     {
-        $binFilePos = (int)$this->binaryDataReader->readUInt64();
+        $binFilePos = (int) $this->binaryDataReader->readUInt64();
         $binFileName = $this->binaryDataReader->read(
             $this->eventInfo->getSizeNoHeader() - $this->getSizeToRemoveByVersion()
         );

@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event;
 
 use JsonSerializable;
@@ -9,14 +12,23 @@ use MySQLReplication\BinLog\BinLogCurrent;
 class EventInfo implements JsonSerializable
 {
     private $timestamp;
+
     private $type;
+
     private $id;
+
     private $size;
+
     private $pos;
+
     private $flag;
+
     private $checkSum;
+
     private $sizeNoHeader;
+
     private $dateTime;
+
     private $binLogCurrent;
 
     public function __construct(
@@ -60,7 +72,7 @@ class EventInfo implements JsonSerializable
     public function getSizeNoHeader(): int
     {
         if (empty($this->sizeNoHeader)) {
-            $this->sizeNoHeader = (true === $this->checkSum ? $this->size - 23 : $this->size - 19);
+            $this->sizeNoHeader = ($this->checkSum === true ? $this->size - 23 : $this->size - 19);
         }
 
         return $this->sizeNoHeader;
@@ -80,7 +92,6 @@ class EventInfo implements JsonSerializable
     {
         return $this->id;
     }
-
 
     public function getSize(): int
     {

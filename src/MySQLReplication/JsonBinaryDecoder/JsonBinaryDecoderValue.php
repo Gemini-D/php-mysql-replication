@@ -1,13 +1,19 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\JsonBinaryDecoder;
 
 class JsonBinaryDecoderValue
 {
     private $isResolved;
+
     private $value;
+
     private $type;
+
     private $offset;
 
     public function __construct(

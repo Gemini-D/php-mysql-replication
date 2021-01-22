@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event;
 
 use MySQLReplication\BinaryDataReader\BinaryDataReader;
@@ -8,6 +11,7 @@ use MySQLReplication\BinaryDataReader\BinaryDataReader;
 abstract class EventCommon
 {
     protected $eventInfo;
+
     protected $binaryDataReader;
 
     public function __construct(

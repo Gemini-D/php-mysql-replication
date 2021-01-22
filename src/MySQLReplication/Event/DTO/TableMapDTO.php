@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event\DTO;
 
 use MySQLReplication\Definitions\ConstEventsNames;
@@ -10,6 +13,7 @@ use MySQLReplication\Event\RowEvent\TableMap;
 class TableMapDTO extends EventDTO
 {
     private $type = ConstEventsNames::TABLE_MAP;
+
     private $tableMap;
 
     public function __construct(

@@ -1,13 +1,19 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\BinLog;
 
 class BinLogServerInfo
 {
     private const MYSQL_VERSION_MARIADB = 'MariaDB';
+
     private const MYSQL_VERSION_PERCONA = 'Percona';
+
     private const MYSQL_VERSION_GENERIC = 'MySQL';
+
     private static $serverInfo = [];
 
     public static function parsePackage(string $data, string $version): void
@@ -69,7 +75,6 @@ class BinLogServerInfo
             for ($j = $i; $j < $i + $salt_len; ++$j) {
                 self::$serverInfo['salt'] .= $data[$j];
             }
-
         }
         self::$serverInfo['auth_plugin_name'] = '';
         $i += $salt_len + 1;
@@ -86,23 +91,6 @@ class BinLogServerInfo
         return self::$serverInfo['salt'];
     }
 
-    /**
-     * @see http://stackoverflow.com/questions/37317869/determine-if-mysql-or-percona-or-mariadb
-     */
-    private static function parseVersion(string $version): string
-    {
-        if ('' !== $version) {
-            if (false !== strpos($version, self::MYSQL_VERSION_MARIADB)) {
-                return self::MYSQL_VERSION_MARIADB;
-            }
-            if (false !== strpos($version, self::MYSQL_VERSION_PERCONA)) {
-                return self::MYSQL_VERSION_PERCONA;
-            }
-        }
-
-        return self::MYSQL_VERSION_GENERIC;
-    }
-
     public static function getRevision(): float
     {
         return self::$serverInfo['version_revision'];
@@ -115,21 +103,38 @@ class BinLogServerInfo
 
     public static function isMariaDb(): bool
     {
-        return self::MYSQL_VERSION_MARIADB === self::getVersion();
+        return self::getVersion() === self::MYSQL_VERSION_MARIADB;
     }
 
     public static function isPercona(): bool
     {
-        return self::MYSQL_VERSION_PERCONA === self::getVersion();
+        return self::getVersion() === self::MYSQL_VERSION_PERCONA;
     }
 
     public static function isGeneric(): bool
     {
-        return self::MYSQL_VERSION_GENERIC === self::getVersion();
+        return self::getVersion() === self::MYSQL_VERSION_GENERIC;
+    }
+
+    /**
+     * @see http://stackoverflow.com/questions/37317869/determine-if-mysql-or-percona-or-mariadb
+     */
+    private static function parseVersion(string $version): string
+    {
+        if ($version !== '') {
+            if (strpos($version, self::MYSQL_VERSION_MARIADB) !== false) {
+                return self::MYSQL_VERSION_MARIADB;
+            }
+            if (strpos($version, self::MYSQL_VERSION_PERCONA) !== false) {
+                return self::MYSQL_VERSION_PERCONA;
+            }
+        }
+
+        return self::MYSQL_VERSION_GENERIC;
     }
 
     private static function parseRevision(string $version): float
     {
-        return (float)$version;
+        return (float) $version;
     }
 }

@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event;
 
 use MySQLReplication\Definitions\ConstEventsNames;
@@ -40,10 +43,6 @@ class EventSubscribers implements EventSubscriberInterface
     public function onUpdate(UpdateRowsDTO $event): void
     {
         $this->allEvents($event);
-    }
-
-    protected function allEvents(EventDTO $event): void
-    {
     }
 
     public function onTableMap(TableMapDTO $event): void
@@ -94,5 +93,9 @@ class EventSubscribers implements EventSubscriberInterface
     public function onHeartbeat(HeartbeatDTO $event): void
     {
         $this->allEvents($event);
+    }
+
+    protected function allEvents(EventDTO $event): void
+    {
     }
 }

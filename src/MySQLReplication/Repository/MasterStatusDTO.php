@@ -1,11 +1,15 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Repository;
 
 class MasterStatusDTO
 {
     private $position;
+
     private $file;
 
     public function __construct(
@@ -19,8 +23,8 @@ class MasterStatusDTO
     public static function makeFromArray(array $data): self
     {
         return new self(
-            (int)$data['Position'],
-            (string)$data['File']
+            (int) $data['Position'],
+            (string) $data['File']
         );
     }
 

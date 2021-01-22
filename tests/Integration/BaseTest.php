@@ -1,5 +1,9 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Tests\Integration;
 
 use Doctrine\DBAL\Connection;
@@ -18,31 +22,31 @@ abstract class BaseTest extends TestCase
      * @var MySQLReplicationFactory
      */
     protected $mySQLReplicationFactory;
+
     /**
      * @var Connection
      */
     protected $connection;
+
     /**
      * @var string
      */
     protected $database = 'mysqlreplication_test';
+
     /**
      * @var EventDTO
      */
     protected $currentEvent;
+
     /**
      * @var ConfigBuilder
      */
     protected $configBuilder;
+
     /**
      * @var TestEventSubscribers
      */
     private $testEventSubscribers;
-
-    public function setEvent(EventDTO $eventDTO): void
-    {
-        $this->currentEvent = $eventDTO;
-    }
 
     protected function setUp(): void
     {
@@ -60,7 +64,18 @@ abstract class BaseTest extends TestCase
         self::assertInstanceOf(FormatDescriptionEventDTO::class, $this->getEvent());
         self::assertInstanceOf(QueryDTO::class, $this->getEvent());
         self::assertInstanceOf(QueryDTO::class, $this->getEvent());
+    }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->disconnect();
+    }
+
+    public function setEvent(EventDTO $eventDTO): void
+    {
+        $this->currentEvent = $eventDTO;
     }
 
     public function connect(): void
@@ -84,7 +99,7 @@ abstract class BaseTest extends TestCase
         $this->currentEvent = null;
         while (1) {
             $this->mySQLReplicationFactory->consume();
-            if (null !== $this->currentEvent) {
+            if ($this->currentEvent !== null) {
                 return $this->currentEvent;
             }
         }
@@ -92,16 +107,9 @@ abstract class BaseTest extends TestCase
         return $this->currentEvent;
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->disconnect();
-    }
-
     protected function checkForVersion(float $version): bool
     {
-        return (float)$this->connection->fetchOne('SELECT VERSION()') < $version;
+        return (float) $this->connection->fetchOne('SELECT VERSION()') < $version;
     }
 
     protected function disconnect(): void

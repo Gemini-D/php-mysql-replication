@@ -1,18 +1,21 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Tests\Unit\Gtid;
 
 use MySQLReplication\Gtid\Gtid;
 use MySQLReplication\Gtid\GtidException;
 use MySQLReplication\Tests\Unit\BaseTest;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class GtidTest extends BaseTest
 {
-    private function getGtid(string $data): Gtid
-    {
-        return new Gtid($data);
-    }
-
     /**
      * @test
      */
@@ -40,5 +43,10 @@ class GtidTest extends BaseTest
         $this->expectExceptionCode(GtidException::INCORRECT_GTID_CODE);
 
         $this->getGtid('not gtid');
+    }
+
+    private function getGtid(string $data): Gtid
+    {
+        return new Gtid($data);
     }
 }

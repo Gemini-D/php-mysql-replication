@@ -1,24 +1,41 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\BinaryDataReader;
 
 class BinaryDataReader
 {
     public const NULL_COLUMN = 251;
+
     public const UNSIGNED_CHAR_COLUMN = 251;
+
     public const UNSIGNED_SHORT_COLUMN = 252;
+
     public const UNSIGNED_INT24_COLUMN = 253;
+
     public const UNSIGNED_INT64_COLUMN = 254;
+
     public const UNSIGNED_CHAR_LENGTH = 1;
+
     public const UNSIGNED_SHORT_LENGTH = 2;
+
     public const UNSIGNED_INT24_LENGTH = 3;
+
     public const UNSIGNED_INT32_LENGTH = 4;
+
     public const UNSIGNED_FLOAT_LENGTH = 4;
+
     public const UNSIGNED_DOUBLE_LENGTH = 8;
+
     public const UNSIGNED_INT40_LENGTH = 5;
+
     public const UNSIGNED_INT48_LENGTH = 6;
+
     public const UNSIGNED_INT56_LENGTH = 7;
+
     public const UNSIGNED_INT64_LENGTH = 8;
 
     private $data;
@@ -36,8 +53,15 @@ class BinaryDataReader
     public static function pack64bit(int $value): string
     {
         return pack(
-            'C8', ($value >> 0) & 0xFF, ($value >> 8) & 0xFF, ($value >> 16) & 0xFF, ($value >> 24) & 0xFF,
-            ($value >> 32) & 0xFF, ($value >> 40) & 0xFF, ($value >> 48) & 0xFF, ($value >> 56) & 0xFF
+            'C8',
+            ($value >> 0) & 0xFF,
+            ($value >> 8) & 0xFF,
+            ($value >> 16) & 0xFF,
+            ($value >> 24) & 0xFF,
+            ($value >> 32) & 0xFF,
+            ($value >> 40) & 0xFF,
+            ($value >> 48) & 0xFF,
+            ($value >> 56) & 0xFF
         );
     }
 
@@ -109,7 +133,7 @@ class BinaryDataReader
     {
         $data = unpack('V*', $binary);
 
-        return bcadd((string)$data[1], bcmul((string)$data[2], bcpow('2', '32')));
+        return bcadd((string) $data[1], bcmul((string) $data[2], bcpow('2', '32')));
     }
 
     public function readInt24(): int
@@ -128,7 +152,7 @@ class BinaryDataReader
     {
         $data = unpack('V*', $this->read(self::UNSIGNED_INT64_LENGTH));
 
-        return bcadd((string)$data[1], (string)($data[2] << 32));
+        return bcadd((string) $data[1], (string) ($data[2] << 32));
     }
 
     /**
@@ -283,7 +307,7 @@ class BinaryDataReader
 
     public function isComplete(int $size): bool
     {
-        return !($this->readBytes - 20 < $size);
+        return ! ($this->readBytes - 20 < $size);
     }
 
     public function getBinaryDataLength(): int

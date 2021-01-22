@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event\DTO;
 
 use MySQLReplication\Event\EventInfo;
@@ -9,7 +12,9 @@ use MySQLReplication\Event\RowEvent\TableMap;
 abstract class RowsDTO extends EventDTO
 {
     private $values;
+
     private $changedRows;
+
     private $tableMap;
 
     public function __construct(
@@ -25,6 +30,19 @@ abstract class RowsDTO extends EventDTO
         $this->tableMap = $tableMap;
     }
 
+    public function __toString(): string
+    {
+        return PHP_EOL .
+            '=== Event ' . $this->getType() . ' === ' . PHP_EOL .
+            'Date: ' . $this->eventInfo->getDateTime() . PHP_EOL .
+            'Log position: ' . $this->eventInfo->getPos() . PHP_EOL .
+            'Event size: ' . $this->eventInfo->getSize() . PHP_EOL .
+            'Table: ' . $this->tableMap->getTable() . PHP_EOL .
+            'Affected columns: ' . $this->tableMap->getColumnsAmount() . PHP_EOL .
+            'Changed rows: ' . $this->changedRows . PHP_EOL .
+            'Values: ' . print_r($this->values, true) . PHP_EOL;
+    }
+
     public function getTableMap(): TableMap
     {
         return $this->tableMap;
@@ -38,19 +56,6 @@ abstract class RowsDTO extends EventDTO
     public function getValues(): array
     {
         return $this->values;
-    }
-
-    public function __toString(): string
-    {
-        return PHP_EOL .
-            '=== Event ' . $this->getType() . ' === ' . PHP_EOL .
-            'Date: ' . $this->eventInfo->getDateTime() . PHP_EOL .
-            'Log position: ' . $this->eventInfo->getPos() . PHP_EOL .
-            'Event size: ' . $this->eventInfo->getSize() . PHP_EOL .
-            'Table: ' . $this->tableMap->getTable() . PHP_EOL .
-            'Affected columns: ' . $this->tableMap->getColumnsAmount() . PHP_EOL .
-            'Changed rows: ' . $this->changedRows . PHP_EOL .
-            'Values: ' . print_r($this->values, true) . PHP_EOL;
     }
 
     public function jsonSerialize()

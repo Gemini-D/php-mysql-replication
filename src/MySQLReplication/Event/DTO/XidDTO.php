@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event\DTO;
 
 use MySQLReplication\Definitions\ConstEventsNames;
@@ -9,6 +12,7 @@ use MySQLReplication\Event\EventInfo;
 class XidDTO extends EventDTO
 {
     private $type = ConstEventsNames::XID;
+
     private $xid;
 
     public function __construct(
@@ -20,11 +24,6 @@ class XidDTO extends EventDTO
         $this->xid = $xid;
     }
 
-    public function getXid(): string
-    {
-        return $this->xid;
-    }
-
     public function __toString(): string
     {
         return PHP_EOL .
@@ -33,6 +32,11 @@ class XidDTO extends EventDTO
             'Log position: ' . $this->eventInfo->getPos() . PHP_EOL .
             'Event size: ' . $this->eventInfo->getSize() . PHP_EOL .
             'Transaction ID: ' . $this->xid . PHP_EOL;
+    }
+
+    public function getXid(): string
+    {
+        return $this->xid;
     }
 
     public function getType(): string

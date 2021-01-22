@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\BinLog;
 
 use JsonSerializable;
@@ -11,14 +14,17 @@ class BinLogCurrent implements JsonSerializable
      * @var int
      */
     private $binLogPosition;
+
     /**
      * @var string
      */
     private $binFileName;
+
     /**
      * @var string
      */
     private $gtid;
+
     /**
      * @var string
      */

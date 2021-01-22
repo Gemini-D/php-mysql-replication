@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Socket;
 
 class Socket implements SocketInterface
@@ -23,7 +26,7 @@ class Socket implements SocketInterface
     public function connectToStream(string $host, int $port): void
     {
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (!$this->socket) {
+        if (! $this->socket) {
             throw new SocketException(
                 SocketException::SOCKET_UNABLE_TO_CREATE_MESSAGE . $this->getSocketErrorMessage(),
                 SocketException::SOCKET_UNABLE_TO_CREATE_CODE
@@ -32,19 +35,9 @@ class Socket implements SocketInterface
         socket_set_block($this->socket);
         socket_set_option($this->socket, SOL_SOCKET, SO_KEEPALIVE, 1);
 
-        if (!socket_connect($this->socket, $host, $port)) {
+        if (! socket_connect($this->socket, $host, $port)) {
             throw new SocketException($this->getSocketErrorMessage(), $this->getSocketErrorCode());
         }
-    }
-
-    private function getSocketErrorMessage(): string
-    {
-        return socket_strerror($this->getSocketErrorCode());
-    }
-
-    private function getSocketErrorCode(): int
-    {
-        return socket_last_error();
     }
 
     public function readFromSocket(int $length): string
@@ -55,7 +48,7 @@ class Socket implements SocketInterface
         }
 
         // http://php.net/manual/en/function.socket-recv.php#47182
-        if (0 === $received) {
+        if ($received === 0) {
             throw new SocketException(
                 SocketException::SOCKET_DISCONNECTED_MESSAGE,
                 SocketException::SOCKET_DISCONNECTED_CODE
@@ -67,11 +60,21 @@ class Socket implements SocketInterface
 
     public function writeToSocket(string $data): void
     {
-        if (!socket_write($this->socket, $data, strlen($data))) {
+        if (! socket_write($this->socket, $data, strlen($data))) {
             throw new SocketException(
                 SocketException::SOCKET_UNABLE_TO_WRITE_MESSAGE . $this->getSocketErrorMessage(),
                 SocketException::SOCKET_UNABLE_TO_WRITE_CODE
             );
         }
+    }
+
+    private function getSocketErrorMessage(): string
+    {
+        return socket_strerror($this->getSocketErrorCode());
+    }
+
+    private function getSocketErrorCode(): int
+    {
+        return socket_last_error();
     }
 }

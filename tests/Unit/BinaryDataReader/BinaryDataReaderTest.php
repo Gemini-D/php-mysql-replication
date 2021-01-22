@@ -1,12 +1,19 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace BinaryDataReader\Unit;
 
 use MySQLReplication\BinaryDataReader\BinaryDataReader;
 use MySQLReplication\BinaryDataReader\BinaryDataReaderException;
 use MySQLReplication\Tests\Unit\BaseTest;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class BinaryDataReaderTest extends BaseTest
 {
     /**
@@ -16,11 +23,6 @@ class BinaryDataReaderTest extends BaseTest
     {
         $expected = 'zażółć gęślą jaźń';
         self::assertSame($expected, pack('H*', $this->getBinaryRead(unpack('H*', $expected)[1])->read(52)));
-    }
-
-    private function getBinaryRead($data): BinaryDataReader
-    {
-        return new BinaryDataReader($data);
     }
 
     /**
@@ -53,7 +55,7 @@ class BinaryDataReaderTest extends BaseTest
             [4, pack('I', 123123543), 123123543],
             [5, pack('CI', 71, 2570258120), 657986078791],
             [6, pack('v3', 2570258120, 2570258120, 2570258120), 7456176998088],
-            [7, pack('CSI', 66, 7890, 2570258120), 43121775657013826]
+            [7, pack('CSI', 66, 7890, 2570258120), 43121775657013826],
         ];
     }
 
@@ -68,6 +70,9 @@ class BinaryDataReaderTest extends BaseTest
     /**
      * @dataProvider dataProviderForUInt
      * @test
+     * @param mixed $size
+     * @param mixed $data
+     * @param mixed $expected
      */
     public function shouldReadUIntBySize($size, $data, $expected): void
     {
@@ -167,7 +172,8 @@ class BinaryDataReaderTest extends BaseTest
     {
         $expected = 255;
         self::assertSame(
-            $expected, hexdec(
+            $expected,
+            hexdec(
                 bin2hex(
                     $this->getBinaryRead(pack('cc', 1, $expected))->readLengthString(1)
                 )
@@ -183,7 +189,6 @@ class BinaryDataReaderTest extends BaseTest
         $expected = 777333;
         self::assertSame($expected, $this->getBinaryRead(pack('i', $expected))->readInt32());
     }
-
 
     /**
      * @test
@@ -209,7 +214,8 @@ class BinaryDataReaderTest extends BaseTest
     public function shouldReadTableId(): void
     {
         self::assertSame(
-            '7456176998088', $this->getBinaryRead(pack('v3', 2570258120, 2570258120, 2570258120))->readTableId()
+            '7456176998088',
+            $this->getBinaryRead(pack('v3', 2570258120, 2570258120, 2570258120))->readTableId()
         );
     }
 
@@ -231,7 +237,7 @@ class BinaryDataReaderTest extends BaseTest
     public function shouldPack64bit(): void
     {
         $expected = 9223372036854775807;
-        self::assertSame((string)$expected, $this->getBinaryRead(BinaryDataReader::pack64bit($expected))->readInt64());
+        self::assertSame((string) $expected, $this->getBinaryRead(BinaryDataReader::pack64bit($expected))->readInt64());
     }
 
     /**
@@ -240,5 +246,10 @@ class BinaryDataReaderTest extends BaseTest
     public function shouldGetBinaryDataLength(): void
     {
         self::assertSame(3, $this->getBinaryRead('foo')->getBinaryDataLength());
+    }
+
+    private function getBinaryRead($data): BinaryDataReader
+    {
+        return new BinaryDataReader($data);
     }
 }

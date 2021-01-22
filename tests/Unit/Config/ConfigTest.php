@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace BinaryDataReader\Unit;
 
 use MySQLReplication\Config\Config;
@@ -8,6 +11,10 @@ use MySQLReplication\Config\ConfigBuilder;
 use MySQLReplication\Config\ConfigException;
 use MySQLReplication\Tests\Unit\BaseTest;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class ConfigTest extends BaseTest
 {
     public function shouldMakeConfig(): void
@@ -139,6 +146,7 @@ class ConfigTest extends BaseTest
     /**
      * @test
      * @dataProvider shouldCheckHeartbeatPeriodProvider
+     * @param mixed $heartbeatPeriod
      */
     public function shouldCheckHeartbeatPeriod($heartbeatPeriod): void
     {
@@ -165,6 +173,7 @@ class ConfigTest extends BaseTest
     /**
      * @test
      * @dataProvider shouldValidateProvider
+     * @param mixed $configValue
      */
     public function shouldValidate(string $configKey, $configValue, string $expectedMessage, int $expectedCode): void
     {
@@ -176,5 +185,4 @@ class ConfigTest extends BaseTest
         $config = (new ConfigBuilder())->{'with' . strtoupper($configKey)}($configValue)->build();
         $config::validate();
     }
-
 }

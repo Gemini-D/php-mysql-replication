@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\BinLog;
 
 use MySQLReplication\BinaryDataReader\BinaryDataReader;
@@ -14,18 +17,24 @@ use MySQLReplication\Socket\SocketInterface;
 class BinLogSocketConnect
 {
     private const COM_BINLOG_DUMP = 0x12;
+
     private const COM_REGISTER_SLAVE = 0x15;
+
     private const COM_BINLOG_DUMP_GTID = 0x1e;
 
     /**
-     * http://dev.mysql.com/doc/internals/en/auth-phase-fast-path.html 00 FE
+     * http://dev.mysql.com/doc/internals/en/auth-phase-fast-path.html 00 FE.
      */
     private $packageOkHeader = [0, 254];
+
     private $binaryDataMaxLength = 16777215;
+
     private $checkSum = false;
 
     private $repository;
+
     private $socket;
+
     private $binLogCurrent;
 
     /**
@@ -54,21 +63,21 @@ class BinLogSocketConnect
     public function getResponse(bool $checkResponse = true): string
     {
         $header = $this->socket->readFromSocket(4);
-        if ('' === $header) {
+        if ($header === '') {
             return '';
         }
         $dataLength = unpack('L', $header[0] . $header[1] . $header[2] . chr(0))[1];
         $isMaxDataLength = $dataLength === $this->binaryDataMaxLength;
 
         $result = $this->socket->readFromSocket($dataLength);
-        if (true === $checkResponse) {
+        if ($checkResponse === true) {
             $this->isWriteSuccessful($result);
         }
 
         // https://dev.mysql.com/doc/internals/en/sending-more-than-16mbyte.html
         while ($isMaxDataLength) {
             $header = $this->socket->readFromSocket(4);
-            if ('' === $header) {
+            if ($header === '') {
                 return $result;
             }
             $dataLength = unpack('L', $header[0] . $header[1] . $header[2] . chr(0))[1];
@@ -80,13 +89,23 @@ class BinLogSocketConnect
         return $result;
     }
 
+    public function getBinLogCurrent(): BinLogCurrent
+    {
+        return $this->binLogCurrent;
+    }
+
+    public function getCheckSum(): bool
+    {
+        return $this->checkSum;
+    }
+
     /**
      * @throws BinLogException
      */
     private function isWriteSuccessful(string $data): void
     {
         $head = ord($data[0]);
-        if (!in_array($head, $this->packageOkHeader, true)) {
+        if (! in_array($head, $this->packageOkHeader, true)) {
             $errorCode = unpack('v', $data[1] . $data[2])[1];
             $errorMessage = '';
             $packetLength = strlen($data);
@@ -101,7 +120,7 @@ class BinLogSocketConnect
     /**
      * @throws BinLogException
      * @throws SocketException
-     * @link http://dev.mysql.com/doc/internals/en/secure-password-authentication.html#packet-Authentication::Native41
+     * @see http://dev.mysql.com/doc/internals/en/secure-password-authentication.html#packet-Authentication::Native41
      */
     private function authenticate(): void
     {
@@ -112,8 +131,9 @@ class BinLogSocketConnect
             $data .= chr(0);
         }
         $result = sha1(Config::getPassword(), true) ^ sha1(
-                BinLogServerInfo::getSalt() . sha1(sha1(Config::getPassword(), true), true), true
-            );
+            BinLogServerInfo::getSalt() . sha1(sha1(Config::getPassword(), true), true),
+            true
+        );
 
         $data = $data . Config::getUser() . chr(0) . chr(strlen($result)) . $result;
         $str = pack('L', strlen($data));
@@ -126,7 +146,7 @@ class BinLogSocketConnect
 
     /**
      * http://dev.mysql.com/doc/internals/en/capability-flags.html#packet-protocol::capabilityflags
-     * https://github.com/siddontang/mixer/blob/master/doc/protocol.txt
+     * https://github.com/siddontang/mixer/blob/master/doc/protocol.txt.
      */
     private static function getCapabilities(): int
     {
@@ -137,7 +157,7 @@ class BinLogSocketConnect
         $secureConnection = 1 << 15;
         $protocol41 = 1 << 9;
 
-        return ($longPassword | $longFlag | $transactions | $protocol41 | $secureConnection | $noSchema);
+        return $longPassword | $longFlag | $transactions | $protocol41 | $secureConnection | $noSchema;
     }
 
     /**
@@ -152,17 +172,17 @@ class BinLogSocketConnect
             $this->execute('SET @master_binlog_checksum = @@global.binlog_checksum');
         }
 
-        if (0 !== Config::getHeartbeatPeriod()) {
+        if (Config::getHeartbeatPeriod() !== 0) {
             // master_heartbeat_period is in nanoseconds
             $this->execute('SET @master_heartbeat_period = ' . Config::getHeartbeatPeriod() * 1000000000);
         }
 
         $this->registerSlave();
 
-        if ('' !== Config::getMariaDbGtid()) {
+        if (Config::getMariaDbGtid() !== '') {
             $this->setBinLogDumpMariaGtid();
         }
-        if ('' !== Config::getGtid()) {
+        if (Config::getGtid() !== '') {
             $this->setBinLogDumpGtid();
         } else {
             $this->setBinLogDump();
@@ -258,7 +278,7 @@ class BinLogSocketConnect
     {
         $binFilePos = Config::getBinLogPosition();
         $binFileName = Config::getBinLogFileName();
-        if (0 === $binFilePos && '' === $binFileName) {
+        if ($binFilePos === 0 && $binFileName === '') {
             $masterStatusDTO = $this->repository->getMasterStatus();
             $binFilePos = $masterStatusDTO->getPosition();
             $binFileName = $masterStatusDTO->getFile();
@@ -275,15 +295,5 @@ class BinLogSocketConnect
 
         $this->binLogCurrent->setBinLogPosition($binFilePos);
         $this->binLogCurrent->setBinFileName($binFileName);
-    }
-
-    public function getBinLogCurrent(): BinLogCurrent
-    {
-        return $this->binLogCurrent;
-    }
-
-    public function getCheckSum(): bool
-    {
-        return $this->checkSum;
     }
 }

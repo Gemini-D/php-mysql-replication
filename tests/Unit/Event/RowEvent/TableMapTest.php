@@ -1,12 +1,19 @@
 <?php
 
-
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Tests\Unit\Event\RowEvent;
 
 use MySQLReplication\Event\RowEvent\ColumnDTOCollection;
 use MySQLReplication\Event\RowEvent\TableMap;
 use MySQLReplication\Tests\Unit\BaseTest;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class TableMapTest extends BaseTest
 {
     /**
@@ -21,7 +28,6 @@ class TableMapTest extends BaseTest
             'columnsAmount' => 2,
             'columnDTOCollection' => new ColumnDTOCollection(),
         ];
-
 
         $tableMap = new TableMap(
             $expected['database'],

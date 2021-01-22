@@ -1,12 +1,19 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace BinaryDataReader\Unit;
 
 use MySQLReplication\Cache\ArrayCache;
 use MySQLReplication\Config\ConfigBuilder;
 use MySQLReplication\Tests\Unit\BaseTest;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class ArrayCacheTest extends BaseTest
 {
     private $arrayCache;

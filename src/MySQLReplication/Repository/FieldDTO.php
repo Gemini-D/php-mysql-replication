@@ -1,15 +1,23 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Repository;
 
 class FieldDTO
 {
     private $columnName;
+
     private $collationName;
+
     private $characterSetName;
+
     private $columnComment;
+
     private $columnType;
+
     private $columnKey;
 
     public function __construct(
@@ -37,7 +45,7 @@ class FieldDTO
                 'CHARACTER_SET_NAME' => null,
                 'COLUMN_COMMENT' => '',
                 'COLUMN_TYPE' => 'BLOB',
-                'COLUMN_KEY' => ''
+                'COLUMN_KEY' => '',
             ]
         );
     }

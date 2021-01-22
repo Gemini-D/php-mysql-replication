@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event\RowEvent;
 
 use DateTime;
@@ -285,11 +288,13 @@ class RowEvent extends EventCommon
         7,
         8,
     ];
+
     private $repository;
+
     private $cache;
 
     /**
-     * @var TableMap|null
+     * @var null|TableMap
      */
     private $currentTableMap;
 
@@ -308,7 +313,7 @@ class RowEvent extends EventCommon
     /**
      * This describe the structure of a table.
      * It's send before a change append on a table.
-     * A end user of the lib should have no usage of this
+     * A end user of the lib should have no usage of this.
      * @throws BinaryDataReaderException
      * @throws InvalidArgumentException
      */
@@ -333,7 +338,7 @@ class RowEvent extends EventCommon
         }
 
         $this->binaryDataReader->advance(1);
-        $data['columns_amount'] = (int)$this->binaryDataReader->readCodedBinary();
+        $data['columns_amount'] = (int) $this->binaryDataReader->readCodedBinary();
         $data['column_types'] = $this->binaryDataReader->read($data['columns_amount']);
 
         if ($this->cache->has($data['table_id'])) {
@@ -345,7 +350,7 @@ class RowEvent extends EventCommon
         $fieldDTOCollection = $this->repository->getFields($data['schema_name'], $data['table_name']);
         $columnDTOCollection = new ColumnDTOCollection();
         // if you drop tables and parse of logs you will get empty scheme
-        if (!$fieldDTOCollection->isEmpty()) {
+        if (! $fieldDTOCollection->isEmpty()) {
             $columnLength = strlen($data['column_types']);
             for ($offset = 0; $offset < $columnLength; ++$offset) {
                 // this a dirty hack to prevent row events containing columns which have been dropped
@@ -358,7 +363,7 @@ class RowEvent extends EventCommon
 
                 /** @var FieldDTO $fieldDTO */
                 $fieldDTO = $fieldDTOCollection->offsetGet($offset);
-                if (null !== $fieldDTO) {
+                if ($fieldDTO !== null) {
                     $columnDTOCollection->set($offset, ColumnDTO::make($type, $fieldDTO, $this->binaryDataReader));
                 }
             }
@@ -385,13 +390,67 @@ class RowEvent extends EventCommon
      */
     public function makeWriteRowsDTO(): ?WriteRowsDTO
     {
-        if (!$this->rowInit()) {
+        if (! $this->rowInit()) {
             return null;
         }
 
         $values = $this->getValues();
 
         return new WriteRowsDTO(
+            $this->eventInfo,
+            $this->currentTableMap,
+            count($values),
+            $values
+        );
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws BinaryDataReaderException
+     * @throws JsonBinaryDecoderException
+     * @throws MySQLReplicationException
+     */
+    public function makeDeleteRowsDTO(): ?DeleteRowsDTO
+    {
+        if (! $this->rowInit()) {
+            return null;
+        }
+
+        $values = $this->getValues();
+
+        return new DeleteRowsDTO(
+            $this->eventInfo,
+            $this->currentTableMap,
+            count($values),
+            $values
+        );
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     * @throws BinaryDataReaderException
+     * @throws JsonBinaryDecoderException
+     * @throws MySQLReplicationException
+     */
+    public function makeUpdateRowsDTO(): ?UpdateRowsDTO
+    {
+        if (! $this->rowInit()) {
+            return null;
+        }
+
+        $columnsBinarySize = $this->getColumnsBinarySize($this->currentTableMap->getColumnsAmount());
+        $beforeBinaryData = $this->binaryDataReader->read($columnsBinarySize);
+        $afterBinaryData = $this->binaryDataReader->read($columnsBinarySize);
+
+        $values = [];
+        while (! $this->binaryDataReader->isComplete($this->eventInfo->getSizeNoHeader())) {
+            $values[] = [
+                'before' => $this->getColumnData($beforeBinaryData),
+                'after' => $this->getColumnData($afterBinaryData),
+            ];
+        }
+
+        return new UpdateRowsDTO(
             $this->eventInfo,
             $this->currentTableMap,
             count($values),
@@ -409,19 +468,21 @@ class RowEvent extends EventCommon
         $this->binaryDataReader->advance(2);
 
         if (in_array(
-            $this->eventInfo->getType(), [
-            ConstEventType::DELETE_ROWS_EVENT_V2,
-            ConstEventType::WRITE_ROWS_EVENT_V2,
-            ConstEventType::UPDATE_ROWS_EVENT_V2
-        ], true
+            $this->eventInfo->getType(),
+            [
+                ConstEventType::DELETE_ROWS_EVENT_V2,
+                ConstEventType::WRITE_ROWS_EVENT_V2,
+                ConstEventType::UPDATE_ROWS_EVENT_V2,
+            ],
+            true
         )) {
-            $this->binaryDataReader->read((int)($this->binaryDataReader->readUInt16() / 8));
+            $this->binaryDataReader->read((int) ($this->binaryDataReader->readUInt16() / 8));
         }
 
         $this->binaryDataReader->readCodedBinary();
 
         if ($this->cache->has($tableId)) {
-            /** @var TableMap $tableMap */
+            /* @var TableMap $tableMap */
             $this->currentTableMap = $this->cache->get($tableId);
 
             return true;
@@ -447,7 +508,7 @@ class RowEvent extends EventCommon
         );
 
         $values = [];
-        while (!$this->binaryDataReader->isComplete($this->eventInfo->getSizeNoHeader())) {
+        while (! $this->binaryDataReader->isComplete($this->eventInfo->getSizeNoHeader())) {
             $values[] = $this->getColumnData($binaryData);
         }
 
@@ -456,7 +517,7 @@ class RowEvent extends EventCommon
 
     protected function getColumnsBinarySize(int $columnsAmount): int
     {
-        return (int)(($columnsAmount + 7) / 8);
+        return (int) (($columnsAmount + 7) / 8);
     }
 
     /**
@@ -466,7 +527,7 @@ class RowEvent extends EventCommon
      */
     protected function getColumnData(string $colsBitmap): array
     {
-        if (null === $this->currentTableMap) {
+        if ($this->currentTableMap === null) {
             throw new RuntimeException('Current table map is missing!');
         }
 
@@ -481,84 +542,84 @@ class RowEvent extends EventCommon
             $name = $columnDTO->getName();
             $type = $columnDTO->getType();
 
-            if (0 === $this->bitGet($colsBitmap, $i)) {
+            if ($this->bitGet($colsBitmap, $i) === 0) {
                 $values[$name] = null;
                 continue;
             }
 
             if ($this->checkNull($nullBitmap, $nullBitmapIndex)) {
                 $values[$name] = null;
-            } else if ($type === ConstFieldType::IGNORE) {
+            } elseif ($type === ConstFieldType::IGNORE) {
                 $this->binaryDataReader->advance($columnDTO->getLengthSize());
                 $values[$name] = null;
-            } else if ($type === ConstFieldType::TINY) {
+            } elseif ($type === ConstFieldType::TINY) {
                 if ($columnDTO->isUnsigned()) {
                     $values[$name] = $this->binaryDataReader->readUInt8();
                 } else {
                     $values[$name] = $this->binaryDataReader->readInt8();
                 }
-            } else if ($type === ConstFieldType::SHORT) {
+            } elseif ($type === ConstFieldType::SHORT) {
                 if ($columnDTO->isUnsigned()) {
                     $values[$name] = $this->binaryDataReader->readUInt16();
                 } else {
                     $values[$name] = $this->binaryDataReader->readInt16();
                 }
-            } else if ($type === ConstFieldType::LONG) {
+            } elseif ($type === ConstFieldType::LONG) {
                 if ($columnDTO->isUnsigned()) {
                     $values[$name] = $this->binaryDataReader->readUInt32();
                 } else {
                     $values[$name] = $this->binaryDataReader->readInt32();
                 }
-            } else if ($type === ConstFieldType::LONGLONG) {
+            } elseif ($type === ConstFieldType::LONGLONG) {
                 if ($columnDTO->isUnsigned()) {
                     $values[$name] = $this->binaryDataReader->readUInt64();
                 } else {
                     $values[$name] = $this->binaryDataReader->readInt64();
                 }
-            } else if ($type === ConstFieldType::INT24) {
+            } elseif ($type === ConstFieldType::INT24) {
                 if ($columnDTO->isUnsigned()) {
                     $values[$name] = $this->binaryDataReader->readUInt24();
                 } else {
                     $values[$name] = $this->binaryDataReader->readInt24();
                 }
-            } else if ($type === ConstFieldType::FLOAT) {
+            } elseif ($type === ConstFieldType::FLOAT) {
                 // http://dev.mysql.com/doc/refman/5.7/en/floating-point-types.html FLOAT(7,4)
                 $values[$name] = round($this->binaryDataReader->readFloat(), 4);
-            } else if ($type === ConstFieldType::DOUBLE) {
+            } elseif ($type === ConstFieldType::DOUBLE) {
                 $values[$name] = $this->binaryDataReader->readDouble();
-            } else if ($type === ConstFieldType::VARCHAR || $type === ConstFieldType::STRING) {
+            } elseif ($type === ConstFieldType::VARCHAR || $type === ConstFieldType::STRING) {
                 $values[$name] = $columnDTO->getMaxLength() > 255 ? $this->getString(2) : $this->getString(1);
-            } else if ($type === ConstFieldType::NEWDECIMAL) {
+            } elseif ($type === ConstFieldType::NEWDECIMAL) {
                 $values[$name] = $this->getDecimal($columnDTO);
-            } else if ($type === ConstFieldType::BLOB) {
+            } elseif ($type === ConstFieldType::BLOB) {
                 $values[$name] = $this->getString($columnDTO->getLengthSize());
-            } else if ($type === ConstFieldType::DATETIME) {
+            } elseif ($type === ConstFieldType::DATETIME) {
                 $values[$name] = $this->getDatetime();
-            } else if ($type === ConstFieldType::DATETIME2) {
+            } elseif ($type === ConstFieldType::DATETIME2) {
                 $values[$name] = $this->getDatetime2($columnDTO);
-            } else if ($type === ConstFieldType::TIMESTAMP) {
+            } elseif ($type === ConstFieldType::TIMESTAMP) {
                 $values[$name] = date('Y-m-d H:i:s', $this->binaryDataReader->readUInt32());
-            } else if ($type === ConstFieldType::TIME) {
+            } elseif ($type === ConstFieldType::TIME) {
                 $values[$name] = $this->getTime();
-            } else if ($type === ConstFieldType::TIME2) {
+            } elseif ($type === ConstFieldType::TIME2) {
                 $values[$name] = $this->getTime2($columnDTO);
-            } else if ($type === ConstFieldType::TIMESTAMP2) {
+            } elseif ($type === ConstFieldType::TIMESTAMP2) {
                 $values[$name] = $this->getTimestamp2($columnDTO);
-            } else if ($type === ConstFieldType::DATE) {
+            } elseif ($type === ConstFieldType::DATE) {
                 $values[$name] = $this->getDate();
-            } else if ($type === ConstFieldType::YEAR) {
+            } elseif ($type === ConstFieldType::YEAR) {
                 // https://dev.mysql.com/doc/refman/5.7/en/year.html
                 $year = $this->binaryDataReader->readUInt8();
-                $values[$name] = 0 === $year ? null : 1900 + $year;
-            } else if ($type === ConstFieldType::ENUM) {
+                $values[$name] = $year === 0 ? null : 1900 + $year;
+            } elseif ($type === ConstFieldType::ENUM) {
                 $values[$name] = $this->getEnum($columnDTO);
-            } else if ($type === ConstFieldType::SET) {
+            } elseif ($type === ConstFieldType::SET) {
                 $values[$name] = $this->getSet($columnDTO);
-            } else if ($type === ConstFieldType::BIT) {
+            } elseif ($type === ConstFieldType::BIT) {
                 $values[$name] = $this->getBit($columnDTO);
-            } else if ($type === ConstFieldType::GEOMETRY) {
+            } elseif ($type === ConstFieldType::GEOMETRY) {
                 $values[$name] = $this->getString($columnDTO->getLengthSize());
-            } else if ($type === ConstFieldType::JSON) {
+            } elseif ($type === ConstFieldType::JSON) {
                 $values[$name] = JsonBinaryDecoderService::makeJsonBinaryDecoder($this->getString($columnDTO->getLengthSize()))->parseToString();
             } else {
                 throw new MySQLReplicationException('Unknown row type: ' . $type);
@@ -592,7 +653,7 @@ class RowEvent extends EventCommon
 
     protected function getBitFromBitmap(string $bitmap, int $position): int
     {
-        $bit = $bitmap[(int)($position / 8)];
+        $bit = $bitmap[(int) ($position / 8)];
         if (is_string($bit)) {
             $bit = ord($bit);
         }
@@ -615,7 +676,7 @@ class RowEvent extends EventCommon
 
     /**
      * Read MySQL's new decimal format introduced in MySQL 5
-     * https://dev.mysql.com/doc/refman/5.6/en/precision-math-decimal-characteristics.html
+     * https://dev.mysql.com/doc/refman/5.6/en/precision-math-decimal-characteristics.html.
      * @throws BinaryDataReaderException
      */
     protected function getDecimal(ColumnDTO $columnDTO): string
@@ -623,8 +684,8 @@ class RowEvent extends EventCommon
         $digitsPerInteger = 9;
         $compressedBytes = [0, 1, 1, 2, 2, 3, 3, 4, 4, 4];
         $integral = $columnDTO->getPrecision() - $columnDTO->getDecimals();
-        $unCompIntegral = (int)($integral / $digitsPerInteger);
-        $unCompFractional = (int)($columnDTO->getDecimals() / $digitsPerInteger);
+        $unCompIntegral = (int) ($integral / $digitsPerInteger);
+        $unCompFractional = (int) ($columnDTO->getDecimals() / $digitsPerInteger);
         $compIntegral = $integral - ($unCompIntegral * $digitsPerInteger);
         $compFractional = $columnDTO->getDecimals() - ($unCompFractional * $digitsPerInteger);
 
@@ -669,7 +730,7 @@ class RowEvent extends EventCommon
     {
         $value = $this->binaryDataReader->readUInt64();
         // nasty mysql 0000-00-00 dates
-        if ('0' === $value) {
+        if ($value === '0') {
             return null;
         }
 
@@ -690,11 +751,11 @@ class RowEvent extends EventCommon
      * 6 bits minute         (0-59)
      * 6 bits second         (0-59)
      * ---------------------------
-     * 40 bits = 5 bytes
+     * 40 bits = 5 bytes.
      *
      * @throws BinaryDataReaderException
      *
-     * @link https://dev.mysql.com/doc/internals/en/date-and-time-data-type-representation.html
+     * @see https://dev.mysql.com/doc/internals/en/date-and-time-data-type-representation.html
      */
     protected function getDatetime2(ColumnDTO $columnDTO): ?string
     {
@@ -702,7 +763,7 @@ class RowEvent extends EventCommon
 
         $yearMonth = $this->binaryDataReader->getBinarySlice($data, 1, 17, 40);
 
-        $year = (int)($yearMonth / 13);
+        $year = (int) ($yearMonth / 13);
         $month = $yearMonth % 13;
         $day = $this->binaryDataReader->getBinarySlice($data, 18, 5, 40);
         $hour = $this->binaryDataReader->getBinarySlice($data, 23, 5, 40);
@@ -724,7 +785,7 @@ class RowEvent extends EventCommon
 
     /**
      * @throws BinaryDataReaderException
-     * @link https://dev.mysql.com/doc/internals/en/date-and-time-data-type-representation.html
+     * @see https://dev.mysql.com/doc/internals/en/date-and-time-data-type-representation.html
      */
     protected function getFSP(ColumnDTO $columnDTO): string
     {
@@ -733,27 +794,26 @@ class RowEvent extends EventCommon
         $fsp = $columnDTO->getFsp();
         if ($fsp === 1 || $fsp === 2) {
             $read = 1;
-        } else if ($fsp === 3 || $fsp === 4) {
+        } elseif ($fsp === 3 || $fsp === 4) {
             $read = 2;
-        } else if ($fsp === 5 || $fsp === 6) {
+        } elseif ($fsp === 5 || $fsp === 6) {
             $read = 3;
         }
         if ($read > 0) {
             $microsecond = $this->binaryDataReader->readIntBeBySize($read);
             if ($fsp % 2) {
-                $microsecond = (int)($microsecond / 10);
-
+                $microsecond = (int) ($microsecond / 10);
             }
             $time = $microsecond * (10 ** (6 - $fsp));
         }
 
-        return (string)$time;
+        return (string) $time;
     }
 
     protected function getTime(): string
     {
         $data = $this->binaryDataReader->readUInt24();
-        if (0 === $data) {
+        if ($data === 0) {
             return '00:00:00';
         }
 
@@ -768,7 +828,7 @@ class RowEvent extends EventCommon
      * 6 bits minute (0-59)
      * 6 bits second (0-59)
      * ---------------------
-     * 24 bits = 3 bytes
+     * 24 bits = 3 bytes.
      *
      * @throws BinaryDataReaderException
      */
@@ -788,9 +848,9 @@ class RowEvent extends EventCommon
      */
     protected function getTimestamp2(ColumnDTO $columnDTO): string
     {
-        $datetime = (string)date('Y-m-d H:i:s', $this->binaryDataReader->readInt32Be());
+        $datetime = (string) date('Y-m-d H:i:s', $this->binaryDataReader->readInt32Be());
         $fsp = $this->getFSP($columnDTO);
-        if ('' !== $fsp) {
+        if ($fsp !== '') {
             $datetime .= '.' . $fsp;
         }
 
@@ -800,7 +860,7 @@ class RowEvent extends EventCommon
     protected function getDate(): ?string
     {
         $time = $this->binaryDataReader->readUInt24();
-        if (0 === $time) {
+        if ($time === 0) {
             return null;
         }
 
@@ -852,12 +912,12 @@ class RowEvent extends EventCommon
         for ($byte = 0; $byte < $columnDTO->getBytes(); ++$byte) {
             $current_byte = '';
             $data = $this->binaryDataReader->readUInt8();
-            if (0 === $byte) {
-                if (1 === $columnDTO->getBytes()) {
+            if ($byte === 0) {
+                if ($columnDTO->getBytes() === 1) {
                     $end = $columnDTO->getBits();
                 } else {
                     $end = $columnDTO->getBits() % 8;
-                    if (0 === $end) {
+                    if ($end === 0) {
                         $end = 8;
                     }
                 }
@@ -871,65 +931,10 @@ class RowEvent extends EventCommon
                 } else {
                     $current_byte .= '0';
                 }
-
             }
             $res .= strrev($current_byte);
         }
 
         return $res;
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     * @throws BinaryDataReaderException
-     * @throws JsonBinaryDecoderException
-     * @throws MySQLReplicationException
-     */
-    public function makeDeleteRowsDTO(): ?DeleteRowsDTO
-    {
-        if (!$this->rowInit()) {
-            return null;
-        }
-
-        $values = $this->getValues();
-
-        return new DeleteRowsDTO(
-            $this->eventInfo,
-            $this->currentTableMap,
-            count($values),
-            $values
-        );
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     * @throws BinaryDataReaderException
-     * @throws JsonBinaryDecoderException
-     * @throws MySQLReplicationException
-     */
-    public function makeUpdateRowsDTO(): ?UpdateRowsDTO
-    {
-        if (!$this->rowInit()) {
-            return null;
-        }
-
-        $columnsBinarySize = $this->getColumnsBinarySize($this->currentTableMap->getColumnsAmount());
-        $beforeBinaryData = $this->binaryDataReader->read($columnsBinarySize);
-        $afterBinaryData = $this->binaryDataReader->read($columnsBinarySize);
-
-        $values = [];
-        while (!$this->binaryDataReader->isComplete($this->eventInfo->getSizeNoHeader())) {
-            $values[] = [
-                'before' => $this->getColumnData($beforeBinaryData),
-                'after' => $this->getColumnData($afterBinaryData)
-            ];
-        }
-
-        return new UpdateRowsDTO(
-            $this->eventInfo,
-            $this->currentTableMap,
-            count($values),
-            $values
-        );
     }
 }

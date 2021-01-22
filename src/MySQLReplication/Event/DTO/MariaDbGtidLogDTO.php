@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event\DTO;
 
 use MySQLReplication\Definitions\ConstEventsNames;
@@ -9,8 +12,11 @@ use MySQLReplication\Event\EventInfo;
 class MariaDbGtidLogDTO extends EventDTO
 {
     private $type = ConstEventsNames::MARIADB_GTID;
+
     private $flag;
+
     private $domainId;
+
     private $mariaDbGtid;
 
     public function __construct(
@@ -38,12 +44,10 @@ class MariaDbGtidLogDTO extends EventDTO
             'Sequence Number: ' . $this->mariaDbGtid . PHP_EOL;
     }
 
-
     public function getType(): string
     {
         return $this->type;
     }
-
 
     public function jsonSerialize()
     {

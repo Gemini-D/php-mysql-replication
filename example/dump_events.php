@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 error_reporting(E_ALL);
 date_default_timezone_set('UTC');
 include __DIR__ . '/../vendor/autoload.php';
@@ -11,9 +14,9 @@ use MySQLReplication\Event\EventSubscribers;
 use MySQLReplication\MySQLReplicationFactory;
 
 /**
- * Your db configuration
+ * Your db configuration.
  * @see ConfigBuilder
- * @link https://github.com/krowinski/php-mysql-replication/blob/master/README.md
+ * @see https://github.com/krowinski/php-mysql-replication/blob/master/README.md
  */
 $binLogStream = new MySQLReplicationFactory(
     (new ConfigBuilder())
@@ -26,13 +29,12 @@ $binLogStream = new MySQLReplicationFactory(
         ->build()
 );
 
-/**
+/*
  * Register your events handler
  * @see EventSubscribers
  */
 $binLogStream->registerSubscriber(
-    new class() extends EventSubscribers
-    {
+    new class() extends EventSubscribers {
         public function allEvents(EventDTO $event): void
         {
             // all events got __toString() implementation

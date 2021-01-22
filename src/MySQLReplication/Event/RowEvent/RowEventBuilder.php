@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event\RowEvent;
 
 use MySQLReplication\BinaryDataReader\BinaryDataReader;
@@ -11,11 +14,14 @@ use Psr\SimpleCache\CacheInterface;
 class RowEventBuilder
 {
     private $repository;
+
     private $cache;
+
     /**
      * @var BinaryDataReader
      */
     private $package;
+
     /**
      * @var EventInfo
      */

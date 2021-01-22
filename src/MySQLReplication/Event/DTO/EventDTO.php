@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Event\DTO;
 
 use JsonSerializable;
@@ -20,12 +23,12 @@ abstract class EventDTO extends GenericEvent implements JsonSerializable
         $this->eventInfo = $eventInfo;
     }
 
+    abstract public function __toString(): string;
+
     public function getEventInfo(): EventInfo
     {
         return $this->eventInfo;
     }
 
     abstract public function getType(): string;
-
-    abstract public function __toString(): string;
 }

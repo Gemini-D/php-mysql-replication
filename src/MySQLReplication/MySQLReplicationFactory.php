@@ -1,11 +1,14 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception;
 use MySQLReplication\BinaryDataReader\BinaryDataReaderException;
 use MySQLReplication\BinLog\BinLogException;
 use MySQLReplication\BinLog\BinLogSocketConnect;
@@ -31,7 +34,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class MySQLReplicationFactory
 {
     private $connection;
+
     private $eventDispatcher;
+
     private $event;
 
     /**
@@ -50,7 +55,7 @@ class MySQLReplicationFactory
     ) {
         $config::validate();
 
-        if (null === $repository) {
+        if ($repository === null) {
             $this->connection = DriverManager::getConnection(
                 [
                     'user' => Config::getUser(),
@@ -58,18 +63,18 @@ class MySQLReplicationFactory
                     'host' => Config::getHost(),
                     'port' => Config::getPort(),
                     'driver' => 'pdo_mysql',
-                    'charset' => Config::getCharset()
+                    'charset' => Config::getCharset(),
                 ]
             );
             $repository = new MySQLRepository($this->connection);
         }
-        if (null === $cache) {
+        if ($cache === null) {
             $cache = new ArrayCache();
         }
 
         $this->eventDispatcher = $eventDispatcher ?: new EventDispatcher();
 
-        if (null === $socket) {
+        if ($socket === null) {
             $socket = new Socket();
         }
 

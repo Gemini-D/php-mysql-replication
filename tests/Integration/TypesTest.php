@@ -1,10 +1,17 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Tests\Integration;
 
 use MySQLReplication\BinLog\BinLogServerInfo;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class TypesTest extends BaseTest
 {
     /**
@@ -406,7 +413,6 @@ class TypesTest extends BaseTest
         self::assertEquals('12:33:18', $event->getValues()[0]['test']);
     }
 
-
     /**
      * @test
      */
@@ -542,7 +548,8 @@ class TypesTest extends BaseTest
         self::assertEquals('100010101101', $event->getValues()[0]['test3']);
         self::assertEquals('101100111', $event->getValues()[0]['test4']);
         self::assertEquals(
-            '1101011010110100100111100011010100010100101110111011101011011010', $event->getValues()[0]['test5']
+            '1101011010110100100111100011010100010100101110111011101011011010',
+            $event->getValues()[0]['test5']
         );
     }
 
@@ -638,8 +645,7 @@ class TypesTest extends BaseTest
 
     /**
      * https://dev.mysql.com/doc/internals/en/mysql-packet.html
-     * https://dev.mysql.com/doc/internals/en/sending-more-than-16mbyte.html
-     *
+     * https://dev.mysql.com/doc/internals/en/sending-more-than-16mbyte.html.
      */
     public function shouldBeLongerTextThan16Mb(): void
     {
@@ -699,7 +705,8 @@ class TypesTest extends BaseTest
         $event = $this->createAndInsertValue($create_query, $insert_query);
 
         self::assertEquals(
-            '000000000101000000000000000000f03f000000000000f03f', bin2hex($event->getValues()[0]['test'])
+            '000000000101000000000000000000f03f000000000000f03f',
+            bin2hex($event->getValues()[0]['test'])
         );
     }
 
@@ -739,7 +746,6 @@ class TypesTest extends BaseTest
         self::assertNull($event->getValues()[0]['test3']);
         self::assertEquals(42, $event->getValues()[0]['test7']);
         self::assertEquals(84, $event->getValues()[0]['test20']);
-
     }
 
     /**

@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Repository;
 
 use Doctrine\DBAL\Connection;
@@ -45,16 +48,6 @@ class MySQLRepository implements RepositoryInterface, PingableConnection
         return FieldDTOCollection::makeFromArray($this->getConnection()->fetchAllAssociative($sql, [$database, $table]));
     }
 
-    private function getConnection(): Connection
-    {
-        if (false === $this->ping($this->connection)) {
-            $this->connection->close();
-            $this->connection->connect();
-        }
-
-        return $this->connection;
-    }
-
     /**
      * @throws Exception
      */
@@ -69,7 +62,7 @@ class MySQLRepository implements RepositoryInterface, PingableConnection
     {
         $r = '';
         $versions = $this->getConnection()->fetchAllAssociative('SHOW VARIABLES LIKE "version%"');
-        if (is_array($versions) && 0 !== count($versions)) {
+        if (is_array($versions) && count($versions) !== 0) {
             foreach ($versions as $version) {
                 $r .= $version['Value'];
             }
@@ -79,7 +72,7 @@ class MySQLRepository implements RepositoryInterface, PingableConnection
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @throws Exception
      * @throws BinLogException
      */
@@ -104,5 +97,15 @@ class MySQLRepository implements RepositoryInterface, PingableConnection
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    private function getConnection(): Connection
+    {
+        if ($this->ping($this->connection) === false) {
+            $this->connection->close();
+            $this->connection->connect();
+        }
+
+        return $this->connection;
     }
 }

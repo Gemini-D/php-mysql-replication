@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Tests\Unit\Gtid;
 
 use MySQLReplication\Gtid\Gtid;
 use MySQLReplication\Gtid\GtidCollection;
 use MySQLReplication\Gtid\GtidException;
-use MySQLReplication\Gtid\GtidFactory;
 use MySQLReplication\Tests\Unit\BaseTest;
 
 /**
- * Class GtidCollectionTest
- * @package Unit\Gtid
+ * Class GtidCollectionTest.
+ *
+ * @internal
+ * @coversNothing
  */
 class GtidCollectionTest extends BaseTest
 {

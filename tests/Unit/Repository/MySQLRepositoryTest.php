@@ -1,8 +1,10 @@
 <?php
 
-
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Tests\Unit\Repository;
-
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
@@ -14,8 +16,10 @@ use MySQLReplication\Repository\MySQLRepository;
 use MySQLReplication\Tests\Unit\BaseTest;
 
 /**
- * Class MySQLRepositoryTest
- * @package MySQLReplication\Tests\Unit\Repository
+ * Class MySQLRepositoryTest.
+ *
+ * @internal
+ * @coversNothing
  */
 class MySQLRepositoryTest extends BaseTest
 {
@@ -23,6 +27,7 @@ class MySQLRepositoryTest extends BaseTest
      * @var MySQLRepository
      */
     private $mySQLRepositoryTest;
+
     /**
      * @var Connection|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -49,8 +54,8 @@ class MySQLRepositoryTest extends BaseTest
                 'CHARACTER_SET_NAME' => 'charname',
                 'COLUMN_COMMENT' => 'colcommnet',
                 'COLUMN_TYPE' => 'coltype',
-                'COLUMN_KEY' => 'colkey'
-            ]
+                'COLUMN_KEY' => 'colkey',
+            ],
         ];
 
         $this->connection->method('fetchAllAssociative')->willReturn($expected);
@@ -124,7 +129,7 @@ class MySQLRepositoryTest extends BaseTest
     public function shouldReconnect(): void
     {
         // just to cover private getConnection
-        $this->connection->method('executeQuery')->willReturnCallback(function(){
+        $this->connection->method('executeQuery')->willReturnCallback(function () {
             throw new Exception();
         });
         $this->mySQLRepositoryTest->isCheckSum();

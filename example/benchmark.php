@@ -1,5 +1,9 @@
 <?php
+
 declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 error_reporting(E_ALL);
 date_default_timezone_set('UTC');
 include __DIR__ . '/../vendor/autoload.php';
@@ -13,14 +17,18 @@ use MySQLReplication\Event\EventSubscribers;
 use MySQLReplication\MySQLReplicationFactory;
 
 /**
- * Simple benchmark to test how fast events are consumed
+ * Simple benchmark to test how fast events are consumed.
  */
 class benchmark
 {
     private const DB_NAME = 'mysqlreplication_test';
+
     private const DB_USER = 'root';
+
     private const DB_PASS = 'root';
+
     private const DB_HOST = '127.0.0.1';
+
     private const DB_PORT = 3306;
 
     private $binLogStream;
@@ -50,9 +58,9 @@ class benchmark
         );
 
         $this->binLogStream->registerSubscriber(
-            new  class extends EventSubscribers
-            {
+            new class() extends EventSubscribers {
                 private $start;
+
                 private $counter = 0;
 
                 public function __construct()
@@ -64,24 +72,10 @@ class benchmark
                 {
                     ++$this->counter;
                     if (0 === ($this->counter % 1000)) {
-                        echo ((int)($this->counter / (microtime(true) - $this->start)) . ' event by seconds (' . $this->counter . ' total)') . PHP_EOL;
+                        echo ((int) ($this->counter / (microtime(true) - $this->start)) . ' event by seconds (' . $this->counter . ' total)') . PHP_EOL;
                     }
                 }
             }
-        );
-    }
-
-    private function getConnection(): Connection
-    {
-        return DriverManager::getConnection(
-            [
-                'user' => self::DB_USER,
-                'password' => self::DB_PASS,
-                'host' => self::DB_HOST,
-                'port' => self::DB_PORT,
-                'driver' => 'pdo_mysql',
-                'dbname' => self::DB_NAME
-            ]
         );
     }
 
@@ -98,6 +92,20 @@ class benchmark
         } else {
             $this->produce();
         }
+    }
+
+    private function getConnection(): Connection
+    {
+        return DriverManager::getConnection(
+            [
+                'user' => self::DB_USER,
+                'password' => self::DB_PASS,
+                'host' => self::DB_HOST,
+                'port' => self::DB_PORT,
+                'driver' => 'pdo_mysql',
+                'dbname' => self::DB_NAME,
+            ]
+        );
     }
 
     private function consume(): void

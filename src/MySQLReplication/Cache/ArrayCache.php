@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Cache;
 
 use MySQLReplication\Config\Config;
@@ -11,7 +14,7 @@ class ArrayCache implements CacheInterface
     private static $tableMapCache = [];
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function get($key, $default = null)
     {
@@ -19,7 +22,7 @@ class ArrayCache implements CacheInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function has($key): bool
     {
@@ -27,7 +30,7 @@ class ArrayCache implements CacheInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function clear(): bool
     {
@@ -37,7 +40,7 @@ class ArrayCache implements CacheInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMultiple($keys, $default = null)
     {
@@ -48,11 +51,11 @@ class ArrayCache implements CacheInterface
             }
         }
 
-        return [] !== $data ? $data : $default;
+        return $data !== [] ? $data : $default;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setMultiple($values, $ttl = null): bool
     {
@@ -64,7 +67,7 @@ class ArrayCache implements CacheInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function set($key, $value, $ttl = null): bool
     {
@@ -72,7 +75,7 @@ class ArrayCache implements CacheInterface
         if (count(self::$tableMapCache) > Config::getTableCacheSize()) {
             self::$tableMapCache = array_slice(
                 self::$tableMapCache,
-                (int)(Config::getTableCacheSize() / 2),
+                (int) (Config::getTableCacheSize() / 2),
                 null,
                 true
             );
@@ -84,7 +87,7 @@ class ArrayCache implements CacheInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function deleteMultiple($keys): bool
     {
@@ -96,7 +99,7 @@ class ArrayCache implements CacheInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function delete($key): bool
     {

@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Repository;
 
 use Doctrine\DBAL\Connection;
@@ -13,8 +16,6 @@ interface PingableConnection
     /**
      * Pings the database server to determine if the connection is still
      * available. Return true/false based on if that was successful or not.
-     *
-     * @return bool
      */
     public function ping(Connection $connection): bool;
 }

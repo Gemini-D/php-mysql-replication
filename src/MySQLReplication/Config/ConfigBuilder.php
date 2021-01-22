@@ -1,26 +1,45 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Config;
 
 class ConfigBuilder
 {
     private $user = '';
+
     private $host = 'localhost';
+
     private $port = 3306;
+
     private $password = '';
+
     private $charset = 'utf8';
+
     private $gtid = '';
+
     private $slaveId = 666;
+
     private $binLogFileName = '';
+
     private $binLogPosition = 0;
+
     private $eventsOnly = [];
+
     private $eventsIgnore = [];
+
     private $tablesOnly = [];
+
     private $databasesOnly = [];
+
     private $mariaDbGtid = '';
+
     private $tableCacheSize = 128;
+
     private $custom = [];
+
     private $heartbeatPeriod = 0.0;
 
     public function withUser(string $user): self
@@ -121,14 +140,12 @@ class ConfigBuilder
         return $this;
     }
 
-
     public function withTableCacheSize(int $tableCacheSize): self
     {
         $this->tableCacheSize = $tableCacheSize;
 
         return $this;
     }
-
 
     public function withCustom(array $custom): self
     {

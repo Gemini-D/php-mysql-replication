@@ -1,7 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\Tests\Integration;
 
 use MySQLReplication\BinLog\BinLogServerInfo;
@@ -18,6 +20,10 @@ use MySQLReplication\MySQLReplicationFactory;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class BasicTest extends BaseTest
 {
     /**
@@ -87,7 +93,7 @@ class BasicTest extends BaseTest
         self::assertInstanceOf(QueryDTO::class, $event);
         self::assertEquals('BEGIN', $event->getQuery());
 
-        /** @var TableMapDTO $event */
+        /* @var TableMapDTO $event */
         self::assertInstanceOf(TableMapDTO::class, $this->getEvent());
 
         /** @var WriteRowsDTO $event */

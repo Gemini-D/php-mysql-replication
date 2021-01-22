@@ -1,6 +1,9 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/**
+ * @license  https://github.com/krowinski/php-mysql-replication/blob/master/LICENSE
+ */
 namespace MySQLReplication\JsonBinaryDecoder;
 
 class JsonBinaryDecoderFormatter
@@ -20,20 +23,6 @@ class JsonBinaryDecoderFormatter
     public function formatValue($val): void
     {
         $this->jsonString .= '"' . self::escapeJsonString($val) . '"';
-    }
-
-    /**
-     * Some characters needs to be escaped
-     * @see http://www.json.org/
-     * @see https://stackoverflow.com/questions/1048487/phps-json-encode-does-not-escape-all-json-control-characters
-     */
-    private static function escapeJsonString($value): string
-    {
-        return str_replace(
-            ["\\", '/', '"', "\n", "\r", "\t", "\x08", "\x0c"],
-            ["\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t", "\\f", "\\b"],
-            $value
-        );
     }
 
     public function formatEndObject(): void
@@ -74,5 +63,20 @@ class JsonBinaryDecoderFormatter
     public function getJsonString(): string
     {
         return $this->jsonString;
+    }
+
+    /**
+     * Some characters needs to be escaped.
+     * @see http://www.json.org/
+     * @see https://stackoverflow.com/questions/1048487/phps-json-encode-does-not-escape-all-json-control-characters
+     * @param mixed $value
+     */
+    private static function escapeJsonString($value): string
+    {
+        return str_replace(
+            ['\\', '/', '"', "\n", "\r", "\t", "\x08", "\x0c"],
+            ['\\\\', '\\/', '\\"', '\\n', '\\r', '\\t', '\\f', '\\b'],
+            $value
+        );
     }
 }
