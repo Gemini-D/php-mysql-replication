@@ -10,6 +10,8 @@ Pure PHP Implementation of MySQL replication protocol. This allow you to receive
 
 Based on a great work of creators：https://github.com/noplay/python-mysql-replication and https://github.com/fengxiangyun/mysql-replication
 
+Forked from [krowinski](https://github.com/krowinski/php-mysql-replication)
+
 Installation
 =========
 
