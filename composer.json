@@ -1,49 +1,55 @@
 {
-  "name": "gemini/php-mysql-replication",
-  "description": "Pure PHP Implementation of MySQL replication protocol. This allow you to receive event like insert, update, delete with their data and raw SQL queries.",
-  "keywords": [
-    "mysql-replication",
-    "php-library",
-    "mysql",
-    "mysql-binlog",
-    "mysql-replication-protocol",
-    "replication",
-    "binlog"
-  ],
-  "type": "library",
-  "require": {
-    "php": ">=7.3",
-    "ext-bcmath": "*",
-    "ext-json": "*",
-    "ext-sockets": "*",
-    "doctrine/collections": "^1.3",
-    "doctrine/dbal": "^3.0",
-    "psr/simple-cache": "^1.0",
-    "symfony/dependency-injection": "^3.1|^4.0|^5.0",
-    "symfony/event-dispatcher": "^3.1|^4.0|^5.0"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^9.0"
-  },
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Kacper Rowiński",
-      "email": "kacper.rowinski@gmail.com"
+    "name": "gemini/php-mysql-replication",
+    "description": "Pure PHP Implementation of MySQL replication protocol. This allow you to receive event like insert, update, delete with their data and raw SQL queries.",
+    "keywords": [
+        "mysql-replication",
+        "php-library",
+        "mysql",
+        "mysql-binlog",
+        "mysql-replication-protocol",
+        "replication",
+        "binlog"
+    ],
+    "type": "library",
+    "require": {
+        "php": ">=7.3",
+        "ext-bcmath": "*",
+        "ext-json": "*",
+        "ext-sockets": "*",
+        "doctrine/collections": "^1.3",
+        "doctrine/dbal": "^3.0",
+        "psr/simple-cache": "^1.0",
+        "symfony/dependency-injection": "^3.1|^4.0|^5.0",
+        "symfony/event-dispatcher": "^3.1|^4.0|^5.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.18",
+        "phpstan/phpstan": "^0.12.68",
+        "phpunit/phpunit": "^9.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kacper Rowiński",
+            "email": "kacper.rowinski@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "MySQLReplication\\": "src/MySQLReplication/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MySQLReplication\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "analyse": "phpstan analyse --memory-limit 1024M -l 0 ./src",
+        "cs-fix": "php-cs-fixer fix $1"
     }
-  ],
-  "autoload": {
-    "psr-4": {
-      "MySQLReplication\\": "src/MySQLReplication/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "MySQLReplication\\Tests\\": "tests/"
-    }
-  },
-  "minimum-stability": "stable",
-  "config": {
-    "sort-packages": true
-  }
 }

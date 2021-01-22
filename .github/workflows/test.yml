@@ -11,14 +11,14 @@ jobs:
     name: Test PHP ${{ matrix.php-version }} on ${{ matrix.mysql-version }}
     runs-on: "${{ matrix.os }}"
     env:
-      DB: {{ matrix.mysql-version }}
+      DB: ${{ matrix.mysql-version }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
         php-version: [ '7.3', '7.4' ]
         engine: [ 'none' ]
         mysql-version: [ 'mariadb:5.5', 'mariadb:10.0', 'mariadb:10.1', 'mysql:5.5', 'mysql:5.6', 'mysql:5.7', 'mysql:8.0' ]
-      max-parallel: 5
+      max-parallel: 7
     steps:
       - name: Checkout
         uses: actions/checkout@v2
