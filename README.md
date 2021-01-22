@@ -1,6 +1,6 @@
 php-mysql-replication
 =========
-[![Build Status](https://travis-ci.org/krowinski/php-mysql-replication.svg?branch=master)](https://travis-ci.org/krowinski/php-mysql-replication)
+![PHPUnit](https://github.com/Gemini-D/php-mysql-replication/workflows/PHPUnit/badge.svg)
 [![Latest Stable Version](https://poser.pugx.org/krowinski/php-mysql-replication/v/stable)](https://packagist.org/packages/krowinski/php-mysql-replication) [![Total Downloads](https://poser.pugx.org/krowinski/php-mysql-replication/downloads)](https://packagist.org/packages/krowinski/php-mysql-replication) [![Latest Unstable Version](https://poser.pugx.org/krowinski/php-mysql-replication/v/unstable)](https://packagist.org/packages/krowinski/php-mysql-replication) 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/4a0e49d4-3802-41d3-bb32-0a8194d0fd4d/mini.png)](https://insight.sensiolabs.com/projects/4a0e49d4-3802-41d3-bb32-0a8194d0fd4d) [![License](https://poser.pugx.org/krowinski/php-mysql-replication/license)](https://packagist.org/packages/krowinski/php-mysql-replication)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/krowinski/php-mysql-replication/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/krowinski/php-mysql-replication/?branch=master)
@@ -18,13 +18,13 @@ Installation
 In you project
 
 ```sh
-composer require krowinski/php-mysql-replication
+composer require gemini/php-mysql-replication
 ```
 
 or standalone 
 
 ```sh
-git clone https://github.com/krowinski/php-mysql-replication.git
+git clone https://github.com/gemini/php-mysql-replication.git
 
 composer install -o
 ```
